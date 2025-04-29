@@ -1,0 +1,46 @@
+---
+- name: Set Chrony variables for Debian-based systems
+  ansible.builtin.set_fact:
+    chrony_path: /etc/chrony/
+    chrony_service: chrony
+  when: ansible_os_family|lower == "debian"
+
+- name: Set Chrony variables for RedHat-based systems
+  ansible.builtin.set_fact:
+    chrony_path: /etc/
+    chrony_service: chronyd
+  when: ansible_os_family|lower == "redhat"
+
+- name: Install chrony on RedHat-based systems (except Fedora)
+  ansible.builtin.dnf:
+    name: chrony
+    state: present
+  when:
+    - ansible_os_family|lower == "redhat"
+    - ansible_distribution|lower != "fedora"
+
+- name: Install chrony on Debian-based systems
+  ansible.builtin.apt:
+    name: chrony
+    update_cache: true
+    state: present
+  when: ansible_os_family|lower == "debian"
+
+- name: Remove existing NTP servers from chrony config
+  ansible.builtin.lineinfile:
+    path: '{{ chrony_path }}chrony.conf'
+    regexp: '^server .* iburst'
+    state: absent
+
+- name: Add NTP server to chrony config
+  ansible.builtin.lineinfile:
+    path: '{{ chrony_path }}chrony.conf'
+    line: "server {{ ntp_server }} iburst"
+    state: present
+  notify: restart chrony service
+
+- name: Ensure chrony service is enabled and started
+  ansible.builtin.systemd:
+    name: '{{ chrony_service }}'
+    enabled: yes
+    state: started

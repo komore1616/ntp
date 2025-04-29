@@ -1,0 +1,13 @@
+services:
+  ntp:
+    image: komore1616/ntp
+    container_name: ntp
+    restart: always
+    environment:
+      - NTP_SERVER_1=0.ru.pool.ntp.org 
+      - NTP_SERVER_2=1.ru.pool.ntp.org 
+      - NTP_SERVER_3=2.ru.pool.ntp.org 
+      - NTP_SERVER_4=3.ru.pool.ntp.org
+      - TZ=Europe/Moscow
+    ports:
+      - 123:123/udp
