@@ -1,0 +1,8 @@
+---
+- name: Setup NTP client with chrony
+  hosts: cli
+  become: yes
+  roles:
+    - role: chrony
+      vars:
+        ntp_server: 172.16.0.1

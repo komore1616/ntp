@@ -1,0 +1,9 @@
+---
+
+all:
+  hosts:
+    cli:
+      ansible_host: 172.16.0.2
+      ansible_user: admin
+      ansible_ssh_pass: admin
+      ansible_sudo_pass: admin
